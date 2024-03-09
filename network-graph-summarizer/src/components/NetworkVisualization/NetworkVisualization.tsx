@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import cytoscape from 'cytoscape';
-import { GraphData } from '../../types';
+import { GraphData, Node, Edge } from '../../types';
 import './NetworkVisualization.css';
 
 interface NetworkVisualizationProps {
@@ -16,7 +16,8 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
         const fetchData = async () => {
             if (!corpusId) return;
 
-            const response = await fetch(`https://paperspotter-staging.g-in.dev/v1/graph/search?corpus_id=${corpusId}`);
+            // const response = await fetch(`https://paperspotter-staging.g-in.dev/v1/graph/search?corpus_id=${corpusId}`);
+            const response = await fetch(`http://0.0.0.0:8000/v1/graph/search?corpus_id=${corpusId}`);
             const data: GraphData = await response.json();
 
             if (cyRef.current) {
@@ -26,10 +27,19 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
             const cy = cytoscape({
                 container: cytoscapeRef.current,
                 elements: [
-                    ...data.nodes.map((node) => ({
-                        data: { id: node.corpus_id, label: node.title, citation_count: node.citation_count },
+                    ...data.nodes.map((node: Node) => ({
+                        data: {
+                            id: node.corpus_id,
+                            corpus_id: node.corpus_id,
+                            title: node.title,
+                            label: node.title,
+                            citation_count: node.citation_count,
+                            reference_count: node.reference_count,
+                            year: node.year,
+                            authors: node.authors.join(', '),
+                        },
                     })),
-                    ...data.edges.map((edge) => ({
+                    ...data.edges.map((edge: Edge) => ({
                         data: {
                             id: edge.edge_id,
                             source: edge.source_corpus,
@@ -93,8 +103,9 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
 
             cyRef.current = cy;
         };
-
-        fetchData();
+        if (corpusId){
+            fetchData();
+        }
     }, [corpusId, onNodeClick]);
 
     const handleZoomIn = () => {

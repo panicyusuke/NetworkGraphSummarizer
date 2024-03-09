@@ -1,8 +1,9 @@
 import React from 'react';
 import './PaperSummary.css';
+import { Node } from '../../types';
 
 interface PaperSummaryProps {
-    node: any;
+    node: Node;
 }
 
 const PaperSummary: React.FC<PaperSummaryProps> = ({ node }) => {
@@ -11,8 +12,12 @@ const PaperSummary: React.FC<PaperSummaryProps> = ({ node }) => {
             <h2>Paper Summary</h2>
             {node ? (
                 <>
-                    <p>Title: {node.label}</p>
-                    {/* その他のノードの情報を表示 */}
+                    <p>CorpusId: {node.corpus_id}</p>
+                    <p>Title: {node.title}</p>
+                    <p>Year: {node.year}</p>
+                    <p>Authors: {node.authors}</p>
+                    <p>Citation Count: {node.citation_count}</p>
+                    <p>Reference Count: {node.reference_count}</p>
                 </>
             ) : (
                 <p>No paper selected.</p>

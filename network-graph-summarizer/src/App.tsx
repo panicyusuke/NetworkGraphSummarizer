@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import NetworkVisualization from './components/NetworkVisualization/NetworkVisualization';
 import Header from './components/Header/Header';
-
 import PaperSummary from './components/PaperSummary/PaperSummary';
 import './App.css';
 
 function App() {
     const [corpusId, setCorpusId] = useState('');
+    const [submitedCorpusId, setSubmitedCorpusId] = useState('');
+    const [selectedNode, setSelectedNode] = useState<any>(null);
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // ここでAPIを呼び出すなどの処理を行う
-        console.log('Submitted Corpus ID:', corpusId);
+        setSubmitedCorpusId(corpusId);
     };
 
-    const [selectedNode, setSelectedNode] = useState<any>(null);
     const handleNodeClick = (node: any) => {
         setSelectedNode(node);
     };
@@ -36,7 +35,7 @@ function App() {
                     </button>
                 </form>
                 <div className="visualization-container">
-                    <NetworkVisualization corpusId={corpusId} onNodeClick={handleNodeClick} />
+                    <NetworkVisualization corpusId={submitedCorpusId} onNodeClick={handleNodeClick} />
                     <PaperSummary node={selectedNode} /> {/* 修正: 選択されたノードをPaperSummaryに渡す */}
                 </div>
             </header>
