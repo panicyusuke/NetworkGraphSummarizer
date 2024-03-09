@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import NetworkVisualization from './components/NetworkVisualization/NetworkVisualization';
+import Header from './components/Header/Header';
+
 import PaperSummary from './components/PaperSummary/PaperSummary';
 import './App.css';
 
@@ -12,8 +14,14 @@ function App() {
         console.log('Submitted Corpus ID:', corpusId);
     };
 
+    const [selectedNode, setSelectedNode] = useState<any>(null);
+    const handleNodeClick = (node: any) => {
+        setSelectedNode(node);
+    };
+
     return (
         <div className="App">
+            <Header />
             <header className="App-header">
                 <form onSubmit={handleSubmit} className="corpus-id-form">
                     <input
@@ -28,8 +36,8 @@ function App() {
                     </button>
                 </form>
                 <div className="visualization-container">
-                    <NetworkVisualization corpusId={corpusId} />
-                    <PaperSummary />
+                    <NetworkVisualization corpusId={corpusId} onNodeClick={handleNodeClick} />
+                    <PaperSummary node={selectedNode} /> {/* 修正: 選択されたノードをPaperSummaryに渡す */}
                 </div>
             </header>
         </div>

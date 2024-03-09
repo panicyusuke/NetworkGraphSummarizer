@@ -5,10 +5,12 @@ import './NetworkVisualization.css';
 
 interface NetworkVisualizationProps {
     corpusId: string;
+    onNodeClick: (node: cytoscape.NodeDataDefinition) => void;
 }
 
-const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId }) => {
+const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, onNodeClick }) => {
     const cytoscapeRef = useRef<HTMLDivElement | null>(null);
+    const cyRef = useRef<cytoscape.Core | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -17,11 +19,15 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId })
             const response = await fetch(`https://paperspotter-staging.g-in.dev/v1/graph/search?corpus_id=${corpusId}`);
             const data: GraphData = await response.json();
 
+            if (cyRef.current) {
+                cyRef.current.destroy();
+            }
+
             const cy = cytoscape({
                 container: cytoscapeRef.current,
                 elements: [
                     ...data.nodes.map((node) => ({
-                        data: {id: node.corpus_id, label: node.title},
+                        data: { id: node.corpus_id, label: node.title, citation_count: node.citation_count },
                     })),
                     ...data.edges.map((edge) => ({
                         data: {
@@ -43,6 +49,22 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId })
                             'font-size': '14px',
                             'text-valign': 'center',
                             'text-halign': 'center',
+                            'width': (node: cytoscape.NodeSingular) => {
+                                const citationCount = node.data('citation_count');
+                                const minSize = 20;
+                                const maxSize = 40;
+                                const sizeRange = maxSize - minSize;
+                                const sizeRatio = citationCount / data.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
+                                return minSize + sizeRange * sizeRatio;
+                            },
+                            'height': (node: cytoscape.NodeSingular) => {
+                                const citationCount = node.data('citation_count');
+                                const minSize = 20;
+                                const maxSize = 40;
+                                const sizeRange = maxSize - minSize;
+                                const sizeRatio = citationCount / data.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
+                                return minSize + sizeRange * sizeRatio;
+                            },
                         },
                     },
                     {
@@ -53,8 +75,6 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId })
                             'target-arrow-color': '#a6d1fa',
                             'target-arrow-shape': 'triangle',
                             'curve-style': 'bezier',
-                            'background-fit': 'contain',
-                            'background-repeat': 'repeat',
                         },
                     },
                 ],
@@ -65,20 +85,50 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId })
                     animate: false,
                 },
             });
-            cy.layout({
-                name: 'circle',
-                directed: true,
-                spacingFactor: 1.5,
-                animate: false,
-            }).run();
+
+            cy.on('tap', 'node', (event) => {
+                const node = event.target;
+                onNodeClick(node.data());
+            });
+
+            cyRef.current = cy;
         };
 
-
         fetchData();
-    }, [corpusId]);
+    }, [corpusId, onNodeClick]);
 
+    const handleZoomIn = () => {
+        if (cyRef.current) {
+            cyRef.current.zoom(cyRef.current.zoom() + 0.1);
+        }
+    };
 
-    return <div ref={cytoscapeRef} className="network-visualization"/>;
+    const handleZoomOut = () => {
+        if (cyRef.current) {
+            cyRef.current.zoom(cyRef.current.zoom() - 0.1);
+        }
+    };
+
+    const handleFit = () => {
+        if (cyRef.current) {
+            cyRef.current.fit();
+        }
+    };
+
+    return (
+        <div>
+            <div ref={cytoscapeRef} className="network-visualization" />
+            <div className="controls">
+                <div className="zoom-controls">
+                    <button onClick={handleZoomIn}>+</button>
+                    <button onClick={handleZoomOut}>-</button>
+                </div>
+                <div className="fit-control">
+                    <button onClick={handleFit}>Fit</button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 export default NetworkVisualization;

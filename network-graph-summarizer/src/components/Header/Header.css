@@ -1,0 +1,23 @@
+.header {
+    background-color: #f0f4f8;
+    padding: 10px;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.app-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.app-description {
+    font-size: 18px;
+    color: #666;
+}

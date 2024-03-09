@@ -1,15 +1,22 @@
 import React from 'react';
 import './PaperSummary.css';
 
-const PaperSummary: React.FC = () => {
+interface PaperSummaryProps {
+    node: any;
+}
+
+const PaperSummary: React.FC<PaperSummaryProps> = ({ node }) => {
     return (
         <div className="paper-summary">
             <h2>Paper Summary</h2>
-            <p>Title: Sample Paper Title</p>
-            <p>Year: 2023</p>
-            <p>Authors: John Doe, Jane Smith</p>
-            <p>Reference Count: 10</p>
-            <p>Citation Count: 5</p>
+            {node ? (
+                <>
+                    <p>Title: {node.label}</p>
+                    {/* その他のノードの情報を表示 */}
+                </>
+            ) : (
+                <p>No paper selected.</p>
+            )}
         </div>
     );
 };
