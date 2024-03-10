@@ -36,7 +36,7 @@ function App() {
                 </form>
                 <div className="visualization-container">
                     <NetworkVisualization corpusId={submitedCorpusId} onNodeClick={handleNodeClick} />
-                    <PaperSummary node={selectedNode} /> {/* 修正: 選択されたノードをPaperSummaryに渡す */}
+                    <PaperSummary node={selectedNode} />
                 </div>
             </header>
         </div>

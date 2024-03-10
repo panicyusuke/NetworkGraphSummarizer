@@ -17,7 +17,7 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
             if (!corpusId) return;
 
             // const response = await fetch(`https://paperspotter-staging.g-in.dev/v1/graph/search?corpus_id=${corpusId}`);
-            const response = await fetch(`http://0.0.0.0:8000/v1/graph/search?corpus_id=${corpusId}`);
+            const response = await fetch(`http://0.0.0.0:8000/v1/graph/papers/search?corpus_id=${corpusId}`);
             const data: GraphData = await response.json();
 
             if (cyRef.current) {

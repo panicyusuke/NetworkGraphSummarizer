@@ -18,3 +18,36 @@ export interface GraphData {
     nodes: Node[];
     edges: Edge[];
 }
+
+export interface AuthorNode {
+    author_id: string;
+    name: string;
+}
+
+export interface AuthorEdge {
+    edge_id: string;
+    author_id: string;
+    corpus_id: string;
+}
+
+export interface AuthorGraphData {
+    nodes: AuthorNode[];
+    edges: AuthorEdge[];
+}
+
+export interface BaseNode {
+    data: {
+        id: string;
+        label: string;
+        [key: string]: any;
+    };
+}
+
+export interface BaseEdge {
+    data: {
+        id: string;
+        source: string;
+        target: string;
+        [key: string]: any;
+    };
+}
