@@ -1,4 +1,4 @@
-export interface Node {
+export interface PaperNode {
     corpus_id: string;
     title: string;
     year: number;
@@ -8,20 +8,22 @@ export interface Node {
     algorithm: null;
 }
 
-export interface Edge {
+export interface CitationsEdge {
     edge_id: string;
     source_corpus: string;
     target_corpus: string;
 }
 
-export interface GraphData {
-    nodes: Node[];
-    edges: Edge[];
+export interface PaperGraphData {
+    nodes: PaperNode[];
+    edges: CitationsEdge[];
 }
 
 export interface AuthorNode {
     author_id: string;
     name: string;
+    paper_count: number;
+    citation_count: number;
 }
 
 export interface AuthorEdge {
@@ -33,21 +35,4 @@ export interface AuthorEdge {
 export interface AuthorGraphData {
     nodes: AuthorNode[];
     edges: AuthorEdge[];
-}
-
-export interface BaseNode {
-    data: {
-        id: string;
-        label: string;
-        [key: string]: any;
-    };
-}
-
-export interface BaseEdge {
-    data: {
-        id: string;
-        source: string;
-        target: string;
-        [key: string]: any;
-    };
 }

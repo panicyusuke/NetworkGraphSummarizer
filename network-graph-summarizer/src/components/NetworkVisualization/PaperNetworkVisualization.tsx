@@ -1,24 +1,36 @@
-import React, { useEffect, useRef } from 'react';
-import cytoscape from 'cytoscape';
-import { GraphData, Node, Edge } from '../../types';
+import React, {useEffect, useRef} from 'react';
+import cytoscape, {LayoutOptions} from 'cytoscape';
+import {PaperGraphData, PaperNode, CitationsEdge} from '../../types';
 import './NetworkVisualization.css';
 
-interface NetworkVisualizationProps {
-    corpusId: string;
+
+interface PaperNetworkVisualizationProps {
+    graphData: PaperGraphData | null;
     onNodeClick: (node: cytoscape.NodeDataDefinition) => void;
+    layout: LayoutName;
 }
 
-const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, onNodeClick }) => {
-    const cytoscapeRef = useRef<HTMLDivElement | null>(null);
-    const cyRef = useRef<cytoscape.Core | null>(null);
+type LayoutName =
+    | 'circle'
+    | 'concentric'
+    | 'breadthfirst'
+    | 'grid'
+    | 'random'
+    | 'cose'
+    | 'cola'
+    | 'klay'
+    | 'spread'
+    | 'euler'
+    | 'timeline';
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!corpusId) return;
 
-            // const response = await fetch(`https://paperspotter-staging.g-in.dev/v1/graph/search?corpus_id=${corpusId}`);
-            const response = await fetch(`http://0.0.0.0:8000/v1/graph/papers/search?corpus_id=${corpusId}`);
-            const data: GraphData = await response.json();
+const PaperNetworkVisualization: React.FC<PaperNetworkVisualizationProps> = ({graphData, onNodeClick, layout}) => {
+        const cytoscapeRef = useRef<HTMLDivElement | null>(null);
+        const cyRef = useRef<cytoscape.Core | null>(null);
+
+        useEffect(() => {
+            if (!graphData) return;
+
 
             if (cyRef.current) {
                 cyRef.current.destroy();
@@ -27,7 +39,7 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
             const cy = cytoscape({
                 container: cytoscapeRef.current,
                 elements: [
-                    ...data.nodes.map((node: Node) => ({
+                    ...graphData.nodes.map((node: PaperNode) => ({
                         data: {
                             id: node.corpus_id,
                             corpus_id: node.corpus_id,
@@ -39,7 +51,7 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
                             authors: node.authors.join(', '),
                         },
                     })),
-                    ...data.edges.map((edge: Edge) => ({
+                    ...graphData.edges.map((edge: CitationsEdge) => ({
                         data: {
                             id: edge.edge_id,
                             source: edge.source_corpus,
@@ -64,7 +76,7 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
                                 const minSize = 20;
                                 const maxSize = 40;
                                 const sizeRange = maxSize - minSize;
-                                const sizeRatio = citationCount / data.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
+                                const sizeRatio = citationCount / graphData.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
                                 return minSize + sizeRange * sizeRatio;
                             },
                             'height': (node: cytoscape.NodeSingular) => {
@@ -72,7 +84,7 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
                                 const minSize = 20;
                                 const maxSize = 40;
                                 const sizeRange = maxSize - minSize;
-                                const sizeRatio = citationCount / data.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
+                                const sizeRatio = citationCount / graphData.nodes.reduce((max, n) => Math.max(max, n.citation_count), 0);
                                 return minSize + sizeRange * sizeRatio;
                             },
                         },
@@ -89,11 +101,11 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
                     },
                 ],
                 layout: {
-                    name: 'circle',
+                    name: layout,
                     directed: true,
                     spacingFactor: 1.5,
                     animate: false,
-                },
+                } as LayoutOptions,
             });
 
             cy.on('tap', 'node', (event) => {
@@ -102,44 +114,43 @@ const NetworkVisualization: React.FC<NetworkVisualizationProps> = ({ corpusId, o
             });
 
             cyRef.current = cy;
+
+
+        }, [graphData, onNodeClick, layout]);
+
+        const handleZoomIn = () => {
+            if (cyRef.current) {
+                cyRef.current.zoom(cyRef.current.zoom() + 0.1);
+            }
         };
-        if (corpusId){
-            fetchData();
-        }
-    }, [corpusId, onNodeClick]);
 
-    const handleZoomIn = () => {
-        if (cyRef.current) {
-            cyRef.current.zoom(cyRef.current.zoom() + 0.1);
-        }
-    };
+        const handleZoomOut = () => {
+            if (cyRef.current) {
+                cyRef.current.zoom(cyRef.current.zoom() - 0.1);
+            }
+        };
 
-    const handleZoomOut = () => {
-        if (cyRef.current) {
-            cyRef.current.zoom(cyRef.current.zoom() - 0.1);
-        }
-    };
+        const handleFit = () => {
+            if (cyRef.current) {
+                cyRef.current.fit();
+            }
+        };
 
-    const handleFit = () => {
-        if (cyRef.current) {
-            cyRef.current.fit();
-        }
-    };
-
-    return (
-        <div>
-            <div ref={cytoscapeRef} className="network-visualization" />
-            <div className="controls">
-                <div className="zoom-controls">
-                    <button onClick={handleZoomIn}>+</button>
-                    <button onClick={handleZoomOut}>-</button>
-                </div>
-                <div className="fit-control">
-                    <button onClick={handleFit}>Fit</button>
+        return (
+            <div>
+                <div ref={cytoscapeRef} className="network-visualization"/>
+                <div className="controls">
+                    <div className="zoom-controls">
+                        <button onClick={handleZoomIn}>+</button>
+                        <button onClick={handleZoomOut}>-</button>
+                    </div>
+                    <div className="fit-control">
+                        <button onClick={handleFit}>Fit</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+;
 
-export default NetworkVisualization;
+export default PaperNetworkVisualization;

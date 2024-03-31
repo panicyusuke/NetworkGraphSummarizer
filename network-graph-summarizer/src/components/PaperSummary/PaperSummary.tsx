@@ -1,9 +1,9 @@
 import React from 'react';
 import './PaperSummary.css';
-import { Node } from '../../types';
+import { PaperNode } from '../../types';
 
 interface PaperSummaryProps {
-    node: Node;
+    node: PaperNode;
 }
 
 const PaperSummary: React.FC<PaperSummaryProps> = ({ node }) => {

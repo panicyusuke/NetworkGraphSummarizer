@@ -21,7 +21,10 @@
 .corpus-id-form {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-bottom: 20px;
+    /*padding: 5px;*/
+    margin: 5px;
 }
 
 .corpus-id-input {
@@ -48,6 +51,47 @@
     display: flex;
     width: 100%;
     flex-grow: 1;
-    gap: 20px; /* 追加: NetworkVisualizationとPaperSummaryの間隔を20pxに設定 */
+    /*justify-content: space-between;*/
+    gap: 40px; /* 追加: NetworkVisualizationとPaperSummaryの間隔を20pxに設定 */
     padding: 20px; /* 追加: visualization-containerの内側に20pxのパディングを設定 */
+    align-items: flex-start;
+
+}
+
+.tab-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.tab {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: none;
+    border-bottom: 4px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.tab:hover {
+    border-bottom-color: #5b9bd5;
+}
+
+.tab.active {
+    border-bottom-color: #5b9bd5;
+    font-weight: bold;
+}
+
+.layout-container {
+    display: flex;
+    justify-content: center;
+}
+
+.layout-select {
+    padding: 5px 20px;
+    font-size: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    outline: none;
 }
