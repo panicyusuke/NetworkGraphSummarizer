@@ -51,7 +51,6 @@
     display: flex;
     width: 100%;
     flex-grow: 1;
-    /*justify-content: space-between;*/
     gap: 40px; /* 追加: NetworkVisualizationとPaperSummaryの間隔を20pxに設定 */
     padding: 20px; /* 追加: visualization-containerの内側に20pxのパディングを設定 */
     align-items: flex-start;
@@ -94,4 +93,11 @@
     border-radius: 4px;
     background-color: #fff;
     outline: none;
+}
+
+.summary-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
 }

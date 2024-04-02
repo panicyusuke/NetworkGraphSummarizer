@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Header from './components/Header/Header';
 import PaperSummary from './components/PaperSummary/PaperSummary';
 import AuthorSummary from './components/AuthorSummary/AuthorSummary';
 import './App.css';
 import PaperNetworkVisualization from "./components/NetworkVisualization/PaperNetworkVisualization";
 import AuthorNetworkVisualization from "./components/NetworkVisualization/AuthorNetworkVisualization";
-import { PaperGraphData, AuthorGraphData } from './types';
+import {PaperGraphData, AuthorGraphData} from './types';
+import GraphSummary from "./components/GraphSummary/GraphSummary";
 
 
 const layouts = [
@@ -88,7 +89,7 @@ function App() {
 
     return (
         <div className="App">
-            <Header />
+            <Header/>
             <header className="App-header">
                 <div className="tab-container">
                     {['citations', 'authors'].map((tab) => (
@@ -128,11 +129,16 @@ function App() {
                 </div>
                 <div className="visualization-container">
                     {renderVisualization()}
-                    {activeTab === 'citations' ? (
-                        <PaperSummary node={selectedNode}/>
-                    ) : (
-                        <AuthorSummary author={selectedAuthor}/> // 追加
-                    )}
+                    <div className="summary-container">
+                        {activeTab === 'citations' ? (
+                            <PaperSummary node={selectedNode}/>
+                        ) : (
+                            <>
+                                <AuthorSummary author={selectedAuthor}/>
+                                <GraphSummary graphData={authorGraphData}/>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
         </div>

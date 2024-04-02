@@ -28,8 +28,10 @@ export interface AuthorNode {
 
 export interface AuthorEdge {
     edge_id: string;
-    author_id: string;
-    corpus_id: string;
+    from_author_id: string;
+    from_author_name: string;
+    to_author_id: string;
+    to_author_name: string;
 }
 
 export interface AuthorGraphData {

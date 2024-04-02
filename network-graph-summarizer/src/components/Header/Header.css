@@ -1,6 +1,6 @@
 .header {
     background-color: #f0f4f8;
-    padding: 10px;
+    padding: 5px;
 }
 
 .header-content {
@@ -12,12 +12,12 @@
 }
 
 .app-title {
-    font-size: 32px;
+    font-size: 20px;
     font-weight: bold;
     margin-right: 20px;
 }
 
 .app-description {
-    font-size: 18px;
+    font-size: 13px;
     color: #666;
 }
