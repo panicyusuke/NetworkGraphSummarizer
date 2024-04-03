@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AuthorSummary from '../AuthorSummary/AuthorSummary';
 import AuthorNetworkVisualization from "../NetworkVisualization/AuthorNetworkVisualization";
 import {AuthorGraphData, LayoutName} from '../../types';
@@ -18,7 +18,7 @@ const layouts: LayoutName[] = [
 
 
 function Authors() {
-    const [authorId, setAuthorId] = useState('152839559');
+    const [authorId, setAuthorId] = useState('2822260');
     const [selectedAuthor, setSelectedAuthor] = useState<any>(null);
     const [selectedLayout, setSelectedLayout] = useState<LayoutName>('circle');
     const [authorGraphData, setAuthorGraphData] = useState<AuthorGraphData | null>(null);
@@ -31,6 +31,7 @@ function Authors() {
                 throw new Error('Network response was not ok');
             }
             const data: AuthorGraphData = await response.json();
+            data.searched_author_id = authorId;
             setAuthorGraphData(data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -46,6 +47,31 @@ function Authors() {
     const [minPapers, setMinPapers] = useState(50);
     const [minCitations, setMinCitations] = useState(50);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState('');
+
+    const [summaryRequested, setSummaryRequested] = useState(false);
+
+    const handleSummaryRequest = () => {
+        setSummaryRequested(true);
+        console.log('summaryRequested updated:', true);
+    };
+
+    const [searchedAuthor, setSearchedAuthor] = useState<any | null>(null);
+
+    useEffect(() => {
+        if (authorGraphData) {
+            const searchedAuthorNode = authorGraphData.nodes.find(
+                (node: any) => node.author_id === authorGraphData.searched_author_id
+            );
+            if (searchedAuthorNode) {
+                setSearchedAuthor({
+                    id: searchedAuthorNode.author_id,
+                    label: searchedAuthorNode.name,
+                    paper_count: searchedAuthorNode.paper_count,
+                    citation_count: searchedAuthorNode.citation_count,
+                });
+            }
+        }
+    }, [authorGraphData]);
 
     return (
         <div>
@@ -70,8 +96,16 @@ function Authors() {
                     layout={selectedLayout}
                 />
                 <div className="summary-container">
-                    <AuthorSummary author={selectedAuthor}/>
-                    <GraphSummary graphData={authorGraphData}/>
+                    <AuthorSummary
+                        sourceAuthor={searchedAuthor}
+                        targetAuthor={selectedAuthor}
+                        edgeWeight={selectedAuthor?.weight}
+                    />
+                    <button className="graph-summarize-button" onClick={handleSummaryRequest} disabled={!authorGraphData}>
+                        ネットワークグラフの要約
+                    </button>
+                    <GraphSummary graphData={authorGraphData} summaryRequested={summaryRequested}/>
+
                 </div>
             </div>
         </div>

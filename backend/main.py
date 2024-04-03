@@ -31,31 +31,7 @@ async def summarize(request: SummarizeRequest):
         1. 本グラフは、Authorノード とPaperノードからなる巨大なネットワークから、任意の著者A, Bの間の累積引用回数を抽出したものです。
         2. 執筆者間の（論文を通した）引用回数の合計が各配列の第三要素に配置されています。
         3. このグラフから、ハブとなる著者や、著者間の関係性を読み取ることができ、誰がこの界隈において重要なのかを知ることができます。また、あるトピックにおける協力関係なども説明できるはずです。
-        4. 本データは以下のCypherクエリの結果を元にしています。
-        ```cypher query
-            MATCH (a:Author{authorId:$author_id})-[:WROTE]->(b:Paper)-[n:CITES]-(c:Paper)<-[:WROTE]-(d:Author)
-            WHERE d.citationcount >= 1000
-            WITH a,d,count(1) as count
-            ORDER BY count(1) DESC LIMIT 15
-            WITH a,COLLECT(distinct d) as dlist
-            WITH [a]+dlist as nodelist
-            UNWIND nodelist as n
-            WITH collect(distinct n) as distednodelist
-            UNWIND distednodelist as a
-            MATCH (a)-[:WROTE]->(b:Paper)-[n:CITES]-(c:Paper)<-[:WROTE]-(d)
-            WHERE d in distednodelist AND a.authorId>d.authorId AND d.citationcount >= 1000
-            WITH CASE startNode(n) WHEN b THEN "REF" ELSE "CITED" END as type,a,d
-            RETURN
-                a.authorId as from_author_id,
-                a.name as from_author_name,
-                d.authorId as to_author_id,
-                d.name as to_author_name,
-                d.citationcount as to_citation_count,
-                d.papercount as to_paper_count,
-            COUNT(CASE type WHEN "REF" THEN 1 ELSE NULL END) AS REF,
-            COUNT(CASE type WHEN "CITED" THEN 1 ELSE NULL END) AS CITED,
-            COUNT(1)
-            ORDER BY COUNT(1);
+        4. これらの情報から、著者が存在するネットワークを解析し、新規研究を画策する研究者をサポートしてあげてください。
         ```
 
         ■ データ:
@@ -67,7 +43,7 @@ async def summarize(request: SummarizeRequest):
     for row in graph_data:
         prompt += f"{row[0]}, {row[1]}, {row[2]}\n"
 
-#     prompt = "Hi How are you?"
+    prompt = "Hi How are you?"
 
     response = requests.post(
         "https://api.anthropic.com/v1/messages",

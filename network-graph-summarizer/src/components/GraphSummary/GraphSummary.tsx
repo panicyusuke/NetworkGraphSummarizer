@@ -5,14 +5,16 @@ import ReactMarkdown from 'react-markdown';
 
 interface GraphSummaryProps {
     graphData: AuthorGraphData | null;
+    summaryRequested: boolean;
+
 }
 
-const GraphSummary: React.FC<GraphSummaryProps> = ({ graphData }) => {
+const GraphSummary: React.FC<GraphSummaryProps> = ({ graphData, summaryRequested }) => {
     const [summary, setSummary] = useState('');
 
     useEffect(() => {
         const fetchSummary = async () => {
-            if (graphData) {
+            if (graphData && summaryRequested) {
                 console.log('graphData:', graphData);
                 const transformedData: Array<[string, string, number]> = graphData.edges.map((edge: any) => [
                     edge.from_author_name,
@@ -50,6 +52,7 @@ const GraphSummary: React.FC<GraphSummaryProps> = ({ graphData }) => {
                                     if (parsedData.summary) {
                                         result = parsedData.summary;
                                         setSummary(result);
+                                        console.log('New summary:', result);
                                     }
                                 } catch (error) {
                                     console.error('Error parsing JSON:', error);
@@ -64,11 +67,10 @@ const GraphSummary: React.FC<GraphSummaryProps> = ({ graphData }) => {
         };
 
         fetchSummary();
-    }, [graphData]);
+    }, [graphData, summaryRequested]);
 
     return (
         <div className="graph-summary">
-            <h2>Graph Summary</h2>
             {summary ? (
                 <ReactMarkdown>{summary}</ReactMarkdown>
             ) : (

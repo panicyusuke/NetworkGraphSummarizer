@@ -37,6 +37,8 @@ export interface AuthorEdge {
 export interface AuthorGraphData {
     nodes: AuthorNode[];
     edges: AuthorEdge[];
+    searched_author_id: string; // 追加
+
 }
 
 export const layouts = [

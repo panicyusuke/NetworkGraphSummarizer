@@ -5,7 +5,7 @@ import './NetworkVisualization.css';
 
 interface AuthorNetworkVisualizationProps {
     graphData: AuthorGraphData | null;
-    onAuthorClick: (authorId: string) => void;
+    onAuthorClick: (author: any) => void;
     layout: LayoutName;
 }
 
@@ -114,6 +114,19 @@ const AuthorNetworkVisualization: React.FC<AuthorNetworkVisualizationProps> = ({
             } as LayoutOptions,
         });
 
+        // 検索起点となったAuthorのノードを強調表示
+        const searchedAuthorNode = cy.nodes(`[id = "${graphData.searched_author_id}"]`);
+        searchedAuthorNode.style({
+            'background-color': '#ff6384',
+            'border-width': 5,
+            'border-color': '#ff6384',
+        });
+
+
+        let selectedNode: any = null;
+        let selectedEdge: any = null;
+
+
         cy.add([
             {
                 group: 'nodes', data: {
@@ -135,7 +148,74 @@ const AuthorNetworkVisualization: React.FC<AuthorNetworkVisualizationProps> = ({
 
         cy.on('tap', 'node[type = "author"]', (event) => {
             const node = event.target;
-            onAuthorClick(node.data()); // Change here
+
+            console.log('Clicked node:', node.data());
+            console.log('Searched author node:', searchedAuthorNode.data());
+
+            onAuthorClick({
+                id: node.data('id'),
+                label: node.data('label'),
+                paper_count: node.data('paper_count'),
+                citation_count: node.data('citation_count'),
+            });
+
+            if (selectedNode) {
+                selectedNode.style({
+                    'background-color': '#5b9bd5',
+                    'border-width': 0,
+                });
+            }
+
+            if (selectedEdge) {
+                selectedEdge.style({
+                    'line-color': '#a6d1fa',
+                    'target-arrow-color': '#a6d1fa',
+                    'width': (edge: any) => {
+                        const weight = edge.data('weight');
+                        const normalizedWidth = (weight - minEdgeWeight) / (maxEdgeWeight - minEdgeWeight);
+                        return edgeWidthRange[0] + normalizedWidth * (edgeWidthRange[1] - edgeWidthRange[0]);
+                    },
+                });
+            }
+
+            if (node.data('id') !== searchedAuthorNode.data('id')) {
+                node.style({
+                    'background-color': '#ffcd28',
+                    'border-width': 5,
+                    'border-color': '#ffcd28',
+                });
+
+                const edges = node.edgesWith(searchedAuthorNode);
+                console.log('Edges between clicked node and searched author node:', edges.length);
+                if (edges.length > 0) {
+                    const edge = edges[0];
+                    console.log('Selected edge:', edge.data());
+
+                    edge.style({
+                        'line-color': '#ffcd28',
+                        'target-arrow-color': '#ffcd28',
+                        'width': 10,
+                    });
+
+                    selectedNode = node;
+                    selectedEdge = edge;
+
+                    onAuthorClick({
+                        ...node.data(),
+                        weight: edge.data('weight'),
+                    });
+                } else {
+                    console.log('No edge found between clicked node and searched author node');
+
+                    selectedNode = node;
+                    selectedEdge = null;
+
+                    onAuthorClick({
+                        ...node.data(),
+                        weight: null,
+                    });
+                }
+            }
         });
 
         // 背景色を修正
