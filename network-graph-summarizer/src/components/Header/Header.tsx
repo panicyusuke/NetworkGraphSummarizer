@@ -3,14 +3,10 @@ import './Header.css';
 
 const Header: React.FC = () => {
     return (
-        <div className="header">
-            <div className="header-content">
-                <h1 className="app-title">Network Graph Summarizer</h1>
-                <p className="app-description">
-                    このアプリケーションは、ネットワークグラフを視覚化し、論文の概要情報を提供します。
-                </p>
-            </div>
-        </div>
+        <header>
+            <h1>論文ネットワーク分析ツール</h1>
+            <p>このアプリケーションは、2億件の論文の中から論文・著者・引用ネットワークを抽出可視化し、Claude3に解釈させることで、効率的な論文調査を支援するためのツールです。</p>
+        </header>
     );
 };
 

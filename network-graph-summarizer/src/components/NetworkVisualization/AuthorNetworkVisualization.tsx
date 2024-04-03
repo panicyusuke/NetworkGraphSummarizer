@@ -114,6 +114,25 @@ const AuthorNetworkVisualization: React.FC<AuthorNetworkVisualizationProps> = ({
             } as LayoutOptions,
         });
 
+        cy.add([
+            {
+                group: 'nodes', data: {
+                    id: 'anotationNode',
+                    label: '__ノードの大きさ： 被引用数合計',
+                },
+                position: {x: cy.width() - 330, y: cy.height() + 130}
+            }
+        ]);
+        cy.add([
+            {
+                group: 'nodes', data: {
+                    id: 'anotationEdge',
+                    label: ' __エッジの太さ： 著者間の累計引用回数',
+                },
+                position: {x: cy.width() - 330, y: cy.height() + 175}
+            }
+        ]);
+
         cy.on('tap', 'node[type = "author"]', (event) => {
             const node = event.target;
             onAuthorClick(node.data()); // Change here

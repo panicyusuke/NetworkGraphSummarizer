@@ -12,6 +12,7 @@
 }
 
 .zoom-controls button,
+
 .fit-control button {
     padding: 5px 10px;
     font-size: 14px;
@@ -20,4 +21,16 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.graph-annotations {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #333;
+    max-width: 300px;
 }

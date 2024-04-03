@@ -1,23 +1,12 @@
-.header {
-    background-color: #f0f4f8;
+header {
+    background-color: #13938a;
+    color: white;
     padding: 5px;
+    text-align: center;
 }
 
-.header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.app-title {
-    font-size: 20px;
+header h1 {
+    margin: 0;
+    font-size: 24px;
     font-weight: bold;
-    margin-right: 20px;
-}
-
-.app-description {
-    font-size: 13px;
-    color: #666;
 }

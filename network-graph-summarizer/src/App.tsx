@@ -1,147 +1,87 @@
-import React, {useState} from 'react';
+import React from 'react';
 import Header from './components/Header/Header';
-import PaperSummary from './components/PaperSummary/PaperSummary';
-import AuthorSummary from './components/AuthorSummary/AuthorSummary';
 import './App.css';
-import PaperNetworkVisualization from "./components/NetworkVisualization/PaperNetworkVisualization";
-import AuthorNetworkVisualization from "./components/NetworkVisualization/AuthorNetworkVisualization";
-import {PaperGraphData, AuthorGraphData} from './types';
-import GraphSummary from "./components/GraphSummary/GraphSummary";
+import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
+import Authors from './components/Authors/Authors';
+import Citations from './components/Citations/Citations';
+import Sidebar from './components/Sidebar/Sidebar';
 
+import citationsImage from './images/citations.png';
+import AuthorsImage from './images/authors.png';
+import CoCiteImage from './images/co-cite.png';
 
-const layouts = [
-    'circle',
-    'concentric',
-    'breadthfirst',
-    'grid',
-    'random',
-    'cose',
-    'cola',
-    'klay',
-    'spread',
-    'euler'
-] as const;
-
-type LayoutName = typeof layouts[number];
-
-function App() {
-    const [corpusId, setCorpusId] = useState('');
-    const [authorId, setAuthorId] = useState('152839559');
-    const [selectedNode, setSelectedNode] = useState<any>(null);
-    const [selectedAuthor, setSelectedAuthor] = useState<any>(null); // 追加
-
-    const [activeTab, setActiveTab] = useState('authors');
-    const [selectedLayout, setSelectedLayout] = useState<LayoutName>('circle');
-    const [paperGraphData, setPaperGraphData] = useState<PaperGraphData | null>(null);
-    const [authorGraphData, setAuthorGraphData] = useState<AuthorGraphData | null>(null);
-
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        try {
-            if (activeTab === 'citations') {
-                const response = await fetch(`http://localhost:8000/v1/graph/papers/search?corpus_id=${corpusId}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data: PaperGraphData = await response.json();
-                setPaperGraphData(data);
-            } else {
-                const response = await fetch(`http://localhost:8000/v1/graph/authors/search?author_id=${authorId}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data: AuthorGraphData = await response.json();
-                setAuthorGraphData(data);
-            }
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
-    const handleNodeClick = (node: any) => {
-        setSelectedNode(node);
-    };
-
-    const handleAuthorClick = (author: any) => {
-        console.log(author);
-        setSelectedAuthor(author);
-    };
-
-    const renderVisualization = () => {
-        if (activeTab === 'citations') {
-            return (
-                <PaperNetworkVisualization
-                    graphData={paperGraphData}
-                    onNodeClick={handleNodeClick}
-                    layout={selectedLayout}
-                />
-            );
-        } else {
-            return (
-                <AuthorNetworkVisualization
-                    graphData={authorGraphData}
-                    onAuthorClick={handleAuthorClick}
-                    layout={selectedLayout}
-                />
-            );
-        }
-    };
-
+function HomePage() {
     return (
-        <div className="App">
-            <Header/>
-            <header className="App-header">
-                <div className="tab-container">
-                    {['citations', 'authors'].map((tab) => (
-                        <div
-                            key={tab}
-                            className={`tab ${activeTab === tab ? 'active' : ''}`}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab}
-                        </div>
-                    ))}
-                </div>
-                <div className="layout-container">
-                    <select
-                        value={selectedLayout}
-                        onChange={(e) => setSelectedLayout(e.target.value as LayoutName)}
-                        className="layout-select"
-                    >
-                        {layouts.map((layout) => (
-                            <option key={layout} value={layout}>
-                                {layout}
-                            </option>
-                        ))}
-                    </select>
-                    <form onSubmit={handleSubmit} className="corpus-id-form">
-                        <input
-                            type="text"
-                            value={activeTab === 'citations' ? corpusId : authorId}
-                            onChange={(e) => activeTab === 'citations' ? setCorpusId(e.target.value) : setAuthorId(e.target.value)}
-                            placeholder={activeTab === 'citations' ? "Enter Corpus ID" : "Enter Author ID"}
-                            className="corpus-id-input"
-                        />
-                        <button type="submit" className="submit-button">
-                            Submit
-                        </button>
-                    </form>
-                </div>
-                <div className="visualization-container">
-                    {renderVisualization()}
-                    <div className="summary-container">
-                        {activeTab === 'citations' ? (
-                            <PaperSummary node={selectedNode}/>
-                        ) : (
-                            <>
-                                <AuthorSummary author={selectedAuthor}/>
-                                <GraphSummary graphData={authorGraphData}/>
-                            </>
-                        )}
+        <div className="home-page">
+            <h2>Paper Network Analytics へようこそ</h2>
+            <p>
+                本アプリは、研究論文の引用関係や著者のネットワークを探索し、知識の広がりを可視化します。
+                以下の機能を提供しています：
+            </p>
+            <ul>
+                <li>論文検索：論文の引用関係を時系列順にネットワーク可視化し、要約を表示します。</li>
+                <li>著者検索：著者間の引用数をもとに円レイアウトでネットワークを可視化し、要約を表示します。</li>
+                <li>共引用による類似論文検索：共通して引用されている論文を検索し、関連性の高い論文を発見できます。</li>
+            </ul>
+            <div className="card-container">
+                <div className="card">
+                    <h3>① 論文系譜可視化</h3>
+                    <img src={citationsImage} alt="論文検索"/>
+                    <div className="card-content">
+                        <p>
+                            論文の引用関係を時系列順にネットワーク可視化し、要約を表示します。
+                            これにより、研究の流れや影響関係を一目で把握することができます。
+                            気になる論文をクリックすると、詳細情報や要約を確認できます。
+                        </p>
+                        <Link to="/citations" className="button-style">論文系譜可視化ページへ</Link>
                     </div>
                 </div>
-            </header>
+                <div className="card">
+                    <h3>② 著者検索</h3>
+                    <img src={AuthorsImage} alt="著者検索"/>
+                    <div className="card-content">
+                        <p>
+                            著者間の引用数をもとに円レイアウトでネットワークを可視化し、要約を表示します。
+                            これにより、著者間の関係性や影響力を把握することができます。
+                            著者をクリックすると、その著者の詳細情報や論文リストを確認できます。
+                        </p>
+                        <Link to="/authors" className="button-style">著者検索ページへ</Link>
+                    </div>
+                </div>
+                <div className="card">
+                    <h3>③ 共引用による類似論文検索</h3>
+                    <img src={CoCiteImage} alt="共引用による類似論文検索"/>
+                    <div className="card-content">
+                        <p>
+                            共通して引用されている論文を検索し、関連性の高い論文を発見できます。
+                            これにより、特定の研究トピックに関連する論文を効率的に探すことができます。
+                            検索結果から気になる論文をクリックすると、詳細情報や要約を確認できます。
+                        </p>
+                        <Link to="/authors" className="button-style">類似論文検索ページへ</Link>
+                    </div>
+                </div>
+            </div>
         </div>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <div className="App">
+                <Header/>
+                <div className="main-content">
+                    <Sidebar/>
+                    <div className="page-content">
+                        <Routes>
+                            <Route path="/" element={<HomePage/>}/>
+                            <Route path="/citations" element={<Citations/>}/>
+                            <Route path="/authors" element={<Authors/>}/>
+                        </Routes>
+                    </div>
+                </div>
+            </div>
+        </Router>
     );
 }
 

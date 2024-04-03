@@ -38,3 +38,14 @@ export interface AuthorGraphData {
     nodes: AuthorNode[];
     edges: AuthorEdge[];
 }
+
+export const layouts = [
+    'circle',
+    'concentric',
+    'breadthfirst',
+    'grid',
+    'random',
+    'cose',
+] as const;
+
+export type LayoutName = typeof layouts[number];
